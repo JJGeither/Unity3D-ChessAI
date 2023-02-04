@@ -172,8 +172,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: bd257b422ddb3fd4a8e9b44f66b46c06, type: 2}
   - {fileID: 2100000, guid: e66e5c07f7e110242bcedb2e9c043e88, type: 2}
   _tileMaterials:
-  - {fileID: 2100000, guid: bd257b422ddb3fd4a8e9b44f66b46c06, type: 2}
-  - {fileID: 2100000, guid: e66e5c07f7e110242bcedb2e9c043e88, type: 2}
+  - {fileID: 2100000, guid: 96f7d047672376540990394afc62a3d0, type: 2}
+  - {fileID: 2100000, guid: 590df497f446d554e996b30fb0997c75, type: 2}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

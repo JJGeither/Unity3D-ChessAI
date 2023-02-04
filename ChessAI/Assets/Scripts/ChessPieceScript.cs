@@ -4,9 +4,7 @@ public class ChessPieceScript : MonoBehaviour
 {
     public class ChessBoard
     {
-        private void Start()
-        {
-        }
+
 
         public ChessBoard(string FENString) //the constructor creates the board
         {
@@ -29,7 +27,8 @@ public class ChessPieceScript : MonoBehaviour
             {
                 
                 char pieceChar = FENString[i];
-                bool isUpper = char.IsUpper(pieceChar);
+                int color = char.IsUpper(pieceChar) ? 1 : 0;
+                Debug.Log(color);
                 int x = j % 8;
                 int y = j / 8;
 
@@ -45,27 +44,27 @@ public class ChessPieceScript : MonoBehaviour
                     {
 
                         case 'p':
-                            _board[x, y] = new Pawn(x, y);
+                            _board[x, y] = new Pawn(x, y, color);
                             break;
 
                         case 'n':
-                            _board[x, y] = new Knight(x, y);
+                            _board[x, y] = new Knight(x, y, color);
                             break;
 
                         case 'b':
-                            _board[x, y] = new Bishop(x, y);
+                            _board[x, y] = new Bishop(x, y, color);
                             break;
 
                         case 'r':
-                            _board[x, y] = new Rook(x, y);
+                            _board[x, y] = new Rook(x, y, color);
                             break;
 
                         case 'k':
-                            _board[x, y] = new King(x, y);
+                            _board[x, y] = new King(x, y, color);
                             break;
 
                         case 'q':
-                            _board[x, y] = new Queen(x, y);
+                            _board[x, y] = new Queen(x, y, color);
                             break;
 
                         default:
@@ -91,10 +90,14 @@ public class ChessPieceScript : MonoBehaviour
     public abstract class ChessPiece
     {
         public GameObject[] pieceFolder = Resources.LoadAll<GameObject>("Pieces");
+        public Material[] materialFolder = Resources.LoadAll<Material>("Materials");
+
+
+        public GameObject pieceObject;
+        public Material pieceMaterial;
         public int X { get; set; }
         public int Y { get; set; }
 
-        public GameObject pieceObject;
 
         public ChessPiece(int x, int y)
         {
@@ -107,9 +110,10 @@ public class ChessPieceScript : MonoBehaviour
 
     public class Pawn : ChessPiece
     {
-        public Pawn(int x, int y) : base(x, y)
+        public Pawn(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[3];
+            pieceObject = pieceFolder[3 + (6 * color)];
+           
         }
 
         public override void Move(int x, int y)
@@ -122,9 +126,9 @@ public class ChessPieceScript : MonoBehaviour
 
     public class Knight : ChessPiece
     {
-        public Knight(int x, int y) : base(x, y)
+        public Knight(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[2];
+            pieceObject = pieceFolder[2 + (6 * color)];
         }
 
         public override void Move(int x, int y)
@@ -137,9 +141,9 @@ public class ChessPieceScript : MonoBehaviour
 
     public class Bishop : ChessPiece
     {
-        public Bishop(int x, int y) : base(x, y)
+        public Bishop(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[0];
+            pieceObject = pieceFolder[(6 * color)];
         }
 
         public override void Move(int x, int y)
@@ -152,9 +156,9 @@ public class ChessPieceScript : MonoBehaviour
 
     public class Rook : ChessPiece
     {
-        public Rook(int x, int y) : base(x, y)
+        public Rook(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[5];
+            pieceObject = pieceFolder[5 + (6 * color)];
         }
 
         public override void Move(int x, int y)
@@ -167,9 +171,9 @@ public class ChessPieceScript : MonoBehaviour
 
     public class King : ChessPiece
     {
-        public King(int x, int y) : base(x, y)
+        public King(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[1];
+            pieceObject = pieceFolder[1 + (6 * color)];
         }
 
         public override void Move(int x, int y)
@@ -182,9 +186,9 @@ public class ChessPieceScript : MonoBehaviour
 
     public class Queen : ChessPiece
     {
-        public Queen(int x, int y) : base(x, y)
+        public Queen(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[4];
+            pieceObject = pieceFolder[4 + (6 * color)];
         }
 
         public override void Move(int x, int y)
