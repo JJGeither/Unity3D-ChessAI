@@ -72,11 +72,30 @@ public class ChessPieceScript : MonoBehaviour
             }
         }
 
+        // Moves a piece at coordinate (fromX, fromY) to coordinate (toX, toY)
+        public void UpdateBoardMove(int fromX, int fromY, int toX, int toY)
+        {
+            // Gets the piece that will be moved
+            ChessPiece fromPiece = GetPiece(fromX, fromY);
+
+            // Sets the to coordinate to the piece from the from coordinate
+            // This destroys the TO piece
+            SetPiece(fromPiece, toX, toY);
+
+            // Clears the form coordinate so that there are not duplicate pieces
+            ClearCoordinate(fromX, fromY);
+        }
+
         public void SetPiece(ChessPiece piece, int x, int y)
         {
             _board[x, y] = piece;
             piece.X = x;
             piece.Y = y;
+        }
+
+        public void ClearCoordinate(int x, int y)
+        {
+            _board[x, y] = null;
         }
 
         public ChessPiece GetPiece(int x, int y)

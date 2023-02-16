@@ -50,7 +50,7 @@ public class ChessSetup : MonoBehaviour
                 rb.isKinematic = true;
 
                 TileController myNewTileController = myNewTile.AddComponent<TileController>();
-                myNewTileController.setTileCoordinate(x, y);
+                myNewTileController.SetTileCoordinate(y, x);    //FIX THIS
             }
         }
     }

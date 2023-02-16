@@ -16,7 +16,7 @@ public class TileController : MonoBehaviour
         bhScriptRef = obj_gameboard.GetComponent<BoardHandler>();
     }
 
-    public void setTileCoordinate(int xCoord, int yCoord)
+    public void SetTileCoordinate(int xCoord, int yCoord)
     {
         _tileCoordX = xCoord;
         _tileCoordY = yCoord;

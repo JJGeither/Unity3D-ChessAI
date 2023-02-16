@@ -11,7 +11,8 @@ public class PieceController : MonoBehaviour
     private bool _isBeingHeld;
     private Rigidbody rb;
     private CPS.ChessPiece _piece;
-    private BoardHandler bhScriptRef;
+    private BoardHandler _bhScriptRef;
+    private CapsuleCollider _collisionComponent;
 
     // Start is called before the first frame update
     private void Start()
@@ -20,7 +21,8 @@ public class PieceController : MonoBehaviour
         _isBeingHeld = false;
         rb = GetComponent<Rigidbody>();
         GameObject obj_gameboard = GameObject.Find("Obj_GameBoard");
-        bhScriptRef = obj_gameboard.GetComponent<BoardHandler>();
+        _bhScriptRef = obj_gameboard.GetComponent<BoardHandler>();
+        _collisionComponent = this.GetComponent<CapsuleCollider>();
     }
 
     private void Update()
@@ -34,8 +36,19 @@ public class PieceController : MonoBehaviour
             {
                 Vector3 test = new Vector3(hit.point.x, hit.point.y + 1.5f, hit.point.z);
                 rb.position = test;
+                _collisionComponent.enabled = false;
             }
         }
+        else
+        {
+            _collisionComponent.enabled = true;
+        }
+    }
+
+    // Sets the position in the world, NOT the coordinates of the board
+    public void SetPosition(float x, float y, float z)
+    {
+        transform.position = new Vector3(x, y, z);
     }
 
     public void SetHold(bool isHolding)
@@ -44,7 +57,7 @@ public class PieceController : MonoBehaviour
 
         // Will only send piece inforation to the Board Controller if it is actually holding a piece
         if (_isBeingHeld)
-            bhScriptRef.SetHold(_piece);
+            _bhScriptRef.SetHold(this.GetComponent<PieceController>());
     }
 
     // Update is called once per frame
@@ -56,5 +69,20 @@ public class PieceController : MonoBehaviour
     public void SetPiece(CPS.ChessPiece newPiece)
     {
         _piece = newPiece;
+    }
+
+    public ref CPS.ChessPiece GetPiece()
+    {
+        return ref _piece;
+    }
+
+    public int GetHeldCoordinateX()
+    {
+        return _piece.X;
+    }
+
+    public int GetHeldCoordinateY()
+    {
+        return _piece.Y;
     }
 }

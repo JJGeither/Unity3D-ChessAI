@@ -9,7 +9,7 @@ public class BoardHandler : MonoBehaviour
 {
     private CPS.ChessBoard _chessBoard;
 
-    private CPS.ChessPiece _pieceHolding;
+    private PieceController _pieceHoldingScriptRef;
 
     // Start is called before the first frame update
     private void Start()
@@ -23,27 +23,28 @@ public class BoardHandler : MonoBehaviour
 
     // Determines which piece is currently being held in order to move
     // Set to null to clear
-    public void SetHold(CPS.ChessPiece piece)
+    public void SetHold(PieceController heldPieceScriptRef)
     {
-        if (piece != null)
+        if (heldPieceScriptRef != null)
         {
-            Debug.Log("Holding: " + piece.X + ", " + piece.Y);
+            _pieceHoldingScriptRef = heldPieceScriptRef;
+            Debug.Log("Holding: " + _pieceHoldingScriptRef.GetHeldCoordinateX() + ", " + _pieceHoldingScriptRef.GetHeldCoordinateY());
         }
         else
             Debug.Log("Piece placed");
-
-        _pieceHolding = piece;
     }
 
-    public CPS.ChessPiece GetHold()
+    public PieceController GetHold()
     {
-        return _pieceHolding;
+        return _pieceHoldingScriptRef;
     }
 
     public void PlacePieceAtCoordinate(int tileCoordX, int tileCoordY)
     {
-        Debug.Log("Placed piece at coordinate" + _pieceHolding.X + _pieceHolding.Y + " to coordinate" + tileCoordX + ", " + tileCoordY);
-        _pieceHolding.Move(tileCoordX, tileCoordY);
+        Debug.Log("Placed piece at coordinate" + _pieceHoldingScriptRef.GetHeldCoordinateX() + _pieceHoldingScriptRef.GetHeldCoordinateY() + " to coordinate" + tileCoordX + ", " + tileCoordY);
+        _pieceHoldingScriptRef.GetPiece().Move(tileCoordX, tileCoordY);
+        _pieceHoldingScriptRef.SetPosition(tileCoordX, .05f, tileCoordY);
+        _pieceHoldingScriptRef.SetHold(false);
         SetHold(null);   //clears the holding piece
     }
 }
