@@ -1,6 +1,8 @@
 using UnityEngine;
 using CPS = ChessPieceScript;   //alias to script.
 
+// This script sets up the game so that the other scripts can handel the actual game
+// It creates the tiles and pieces using the help of the "ChessPieceScript" script
 public class ChessSetup : MonoBehaviour
 {
     [SerializeField]
@@ -15,19 +17,16 @@ public class ChessSetup : MonoBehaviour
     [SerializeField]
     private Material[] _tileMaterials = new Material[2];
 
+    private BoardHandler bhScriptRef;
+
     //private ChessPieceScript _CPS;
 
     // Start is called before the first frame update
     private void Start()
     {
-        //_CPS = GetComponent<ChessPieceScript>();
+        bhScriptRef = this.GetComponent<BoardHandler>();
         DrawTiles();
         SetupBoard();
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
     }
 
     public void DrawTiles()
@@ -35,20 +34,27 @@ public class ChessSetup : MonoBehaviour
         GameObject childObjectTile = new GameObject("ChildObjectTile"); //creates a child to store all the children for organization
         childObjectTile.transform.parent = gameObject.transform;
         int k = 1;
-        for (int i = 0; i < 8; i++)
+        for (int x = 0; x < 8; x++)
         {
             k++;
-            for (int j = 0; j < 8; j++)
+            for (int y = 0; y < 8; y++)
             {
                 k++;
-                GameObject myNewTile = Instantiate(_tile, new Vector3(j * 1.0f, 0, i * 1.0f), Quaternion.identity);
+                GameObject myNewTile = Instantiate(_tile, new Vector3(y * 1.0f, 0, x * 1.0f), Quaternion.identity);
                 myNewTile.transform.parent = childObjectTile.transform;
                 myNewTile.GetComponent<Renderer>().material = _tileMaterials[k % 2];
+
+                // Added for onmousedown detection by the tile controller
+                myNewTile.AddComponent<CapsuleCollider>();
+                Rigidbody rb = myNewTile.AddComponent<Rigidbody>();
+                rb.isKinematic = true;
+
+                TileController myNewTileController = myNewTile.AddComponent<TileController>();
+                myNewTileController.setTileCoordinate(x, y);
             }
         }
     }
 
- 
     public void SetupBoard()
     {
         CPS.ChessBoard chessBoard = new CPS.ChessBoard(_FENString);
@@ -58,13 +64,24 @@ public class ChessSetup : MonoBehaviour
         {
             if (piece != null)
             {
+                // Deals with object transformations
                 GameObject myNewPiece = Instantiate(piece.pieceObject, new Vector3(piece.X, .05f, piece.Y), Quaternion.identity);
-
                 myNewPiece.transform.rotation = Quaternion.Euler(-90, 0, 0);
                 myNewPiece.transform.localScale = new Vector3(1500, 1500, 1500);
-                myNewPiece.transform.parent = childObjectPiece.transform;
-            }
 
+                // Sets the parent of the piece to be a new chess parent object
+                myNewPiece.transform.parent = childObjectPiece.transform;
+
+                // Added for onmousedown detection by the piece controller
+                myNewPiece.AddComponent<CapsuleCollider>();
+                Rigidbody rb = myNewPiece.AddComponent<Rigidbody>();
+                rb.isKinematic = true;
+
+                // Passes the information of the piece into the piece controller
+                PieceController myNewPieceController = myNewPiece.AddComponent<PieceController>();
+                myNewPieceController.SetPiece(piece);
+            }
         }
+        bhScriptRef.SetBoard(ref chessBoard);
     }
 }

@@ -1,11 +1,12 @@
 using UnityEngine;
 
+// This script acts as class declaration and definitions for chess pieces
+// It stores all information regarding pieces such as their potential moves, their models, color affiliation, etc.
+// It also contains a class to represent the entire board
 public class ChessPieceScript : MonoBehaviour
 {
     public class ChessBoard
     {
-
-
         public ChessBoard(string FENString) //the constructor creates the board
         {
             CreatePieces(FENString);
@@ -20,15 +21,13 @@ public class ChessPieceScript : MonoBehaviour
 
         public void CreatePieces(string FENString)
         {
-
             string characterToRemove = "/";
             FENString = FENString.Replace(characterToRemove, string.Empty);
             for (int i = 0, j = 0; i < FENString.Length; i++)
             {
-                
                 char pieceChar = FENString[i];
                 int color = char.IsUpper(pieceChar) ? 1 : 0;
-                Debug.Log(color);
+                //Debug.Log(color);
                 int x = j % 8;
                 int y = j / 8;
 
@@ -42,7 +41,6 @@ public class ChessPieceScript : MonoBehaviour
                     pieceChar = char.ToLower(pieceChar);
                     switch (pieceChar)
                     {
-
                         case 'p':
                             _board[x, y] = new Pawn(x, y, color);
                             break;
@@ -92,12 +90,10 @@ public class ChessPieceScript : MonoBehaviour
         public GameObject[] pieceFolder = Resources.LoadAll<GameObject>("Pieces");
         public Material[] materialFolder = Resources.LoadAll<Material>("Materials");
 
-
         public GameObject pieceObject;
         public Material pieceMaterial;
         public int X { get; set; }
         public int Y { get; set; }
-
 
         public ChessPiece(int x, int y)
         {
@@ -113,7 +109,6 @@ public class ChessPieceScript : MonoBehaviour
         public Pawn(int x, int y, int color) : base(x, y)
         {
             pieceObject = pieceFolder[3 + (6 * color)];
-           
         }
 
         public override void Move(int x, int y)
