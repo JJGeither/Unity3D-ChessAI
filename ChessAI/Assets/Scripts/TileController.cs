@@ -28,7 +28,6 @@ public class TileController : MonoBehaviour
         if (bhScriptRef.GetHold() != null)
         {
             bhScriptRef.PlacePieceAtCoordinate(_tileCoordX, _tileCoordY);
-            bhScriptRef.SetHold(null);
         }
     }
 }

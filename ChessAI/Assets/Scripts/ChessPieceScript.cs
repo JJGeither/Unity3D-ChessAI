@@ -88,9 +88,14 @@ public class ChessPieceScript : MonoBehaviour
 
         public void SetPiece(ChessPiece piece, int x, int y)
         {
+            DeletePiece(x, y);
             _board[x, y] = piece;
-            piece.X = x;
-            piece.Y = y;
+
+            if (piece != null)
+            {
+                piece.coordinateX = x;
+                piece.coordinateY = y;
+            }
         }
 
         public void ClearCoordinate(int x, int y)
@@ -98,9 +103,19 @@ public class ChessPieceScript : MonoBehaviour
             _board[x, y] = null;
         }
 
+        public void DeletePiece(int coordinateX, int coordinateY)
+        {
+            ChessPiece deletePiece = _board[coordinateX, coordinateY];
+            if (deletePiece != null)
+                Destroy(deletePiece.GetGameObject());
+        }
+
         public ChessPiece GetPiece(int x, int y)
         {
-            return _board[x, y];
+            ChessPiece piece = _board[x, y];
+            if (piece != null)
+                return _board[x, y];
+            return null;
         }
     }
 
@@ -109,32 +124,44 @@ public class ChessPieceScript : MonoBehaviour
         public GameObject[] pieceFolder = Resources.LoadAll<GameObject>("Pieces");
         public Material[] materialFolder = Resources.LoadAll<Material>("Materials");
 
-        public GameObject pieceObject;
         public Material pieceMaterial;
-        public int X { get; set; }
-        public int Y { get; set; }
+
+        public GameObject pieceGameObject;
+
+        public int coordinateX { get; set; }
+
+        public int coordinateY { get; set; }
 
         public ChessPiece(int x, int y)
         {
-            X = x;
-            Y = y;
+            coordinateX = x;
+            coordinateY = y;
         }
 
-        public abstract void Move(int x, int y);
+        public void SetGameObject(ref GameObject gameObject)
+        {
+            pieceGameObject = gameObject;
+        }
+
+        public ref GameObject GetGameObject()
+        {
+            return ref pieceGameObject;
+        }
+
+        public void Move(int x, int y)
+        {
+            Debug.Log("Pawn moves from" + coordinateX + "," + coordinateY + " to " + x + "," + y);
+            coordinateX = x;
+            coordinateY = y;
+            pieceGameObject.transform.position = new Vector3(x, .05f, y);
+        }
     }
 
     public class Pawn : ChessPiece
     {
         public Pawn(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[3 + (6 * color)];
-        }
-
-        public override void Move(int x, int y)
-        {
-            Debug.Log("Pawn moves from" + X + "," + Y + " to " + x + "," + y);
-            X = x;
-            Y = y;
+            pieceGameObject = pieceFolder[3 + (6 * color)];
         }
     }
 
@@ -142,14 +169,7 @@ public class ChessPieceScript : MonoBehaviour
     {
         public Knight(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[2 + (6 * color)];
-        }
-
-        public override void Move(int x, int y)
-        {
-            Debug.Log("Knight moves from" + X + "," + Y + " to " + x + "," + y);
-            X = x;
-            Y = y;
+            pieceGameObject = pieceFolder[2 + (6 * color)];
         }
     }
 
@@ -157,14 +177,7 @@ public class ChessPieceScript : MonoBehaviour
     {
         public Bishop(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[(6 * color)];
-        }
-
-        public override void Move(int x, int y)
-        {
-            Debug.Log("Knight moves from" + X + "," + Y + " to " + x + "," + y);
-            X = x;
-            Y = y;
+            pieceGameObject = pieceFolder[(6 * color)];
         }
     }
 
@@ -172,14 +185,7 @@ public class ChessPieceScript : MonoBehaviour
     {
         public Rook(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[5 + (6 * color)];
-        }
-
-        public override void Move(int x, int y)
-        {
-            Debug.Log("Knight moves from" + X + "," + Y + " to " + x + "," + y);
-            X = x;
-            Y = y;
+            pieceGameObject = pieceFolder[5 + (6 * color)];
         }
     }
 
@@ -187,14 +193,7 @@ public class ChessPieceScript : MonoBehaviour
     {
         public King(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[1 + (6 * color)];
-        }
-
-        public override void Move(int x, int y)
-        {
-            Debug.Log("Knight moves from" + X + "," + Y + " to " + x + "," + y);
-            X = x;
-            Y = y;
+            pieceGameObject = pieceFolder[1 + (6 * color)];
         }
     }
 
@@ -202,14 +201,7 @@ public class ChessPieceScript : MonoBehaviour
     {
         public Queen(int x, int y, int color) : base(x, y)
         {
-            pieceObject = pieceFolder[4 + (6 * color)];
-        }
-
-        public override void Move(int x, int y)
-        {
-            Debug.Log("Knight moves from" + X + "," + Y + " to " + x + "," + y);
-            X = x;
-            Y = y;
+            pieceGameObject = pieceFolder[4 + (6 * color)];
         }
     }
 }

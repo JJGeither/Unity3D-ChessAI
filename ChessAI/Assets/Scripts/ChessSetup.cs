@@ -65,7 +65,8 @@ public class ChessSetup : MonoBehaviour
             if (piece != null)
             {
                 // Deals with object transformations
-                GameObject myNewPiece = Instantiate(piece.pieceObject, new Vector3(piece.X, .05f, piece.Y), Quaternion.identity);
+                GameObject myNewPiece = Instantiate(piece.pieceGameObject, new Vector3(piece.coordinateX, .05f, piece.coordinateY), Quaternion.identity);
+                piece.SetGameObject(ref myNewPiece);
                 myNewPiece.transform.rotation = Quaternion.Euler(-90, 0, 0);
                 myNewPiece.transform.localScale = new Vector3(1500, 1500, 1500);
 

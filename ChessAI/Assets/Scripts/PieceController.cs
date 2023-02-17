@@ -27,6 +27,26 @@ public class PieceController : MonoBehaviour
 
     private void Update()
     {
+        UpdateCollider();
+        UpdateHoldingMovement();
+    }
+
+    // Removes the collider for all pieces whenever a piece is being held
+    public void UpdateCollider()
+    {
+        if (_bhScriptRef.GetHold())
+        {
+            _collisionComponent.enabled = false;
+        }
+        else
+        {
+            _collisionComponent.enabled = true;
+        }
+    }
+
+    // Updates the movement of the piece that is being held
+    public void UpdateHoldingMovement()
+    {
         if (_isBeingHeld)
         {
             //GetComponent<Rigidbody>().position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
@@ -36,12 +56,7 @@ public class PieceController : MonoBehaviour
             {
                 Vector3 test = new Vector3(hit.point.x, hit.point.y + 1.5f, hit.point.z);
                 rb.position = test;
-                _collisionComponent.enabled = false;
             }
-        }
-        else
-        {
-            _collisionComponent.enabled = true;
         }
     }
 
@@ -63,7 +78,8 @@ public class PieceController : MonoBehaviour
     // Update is called once per frame
     private void OnMouseDown()
     {
-        SetHold(true);
+        if (!_bhScriptRef.GetHold())
+            SetHold(true);
     }
 
     public void SetPiece(CPS.ChessPiece newPiece)
@@ -78,11 +94,11 @@ public class PieceController : MonoBehaviour
 
     public int GetHeldCoordinateX()
     {
-        return _piece.X;
+        return _piece.coordinateX;
     }
 
     public int GetHeldCoordinateY()
     {
-        return _piece.Y;
+        return _piece.coordinateY;
     }
 }

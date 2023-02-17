@@ -25,11 +25,9 @@ public class BoardHandler : MonoBehaviour
     // Set to null to clear
     public void SetHold(PieceController heldPieceScriptRef)
     {
+        _pieceHoldingScriptRef = heldPieceScriptRef;
         if (heldPieceScriptRef != null)
-        {
-            _pieceHoldingScriptRef = heldPieceScriptRef;
             Debug.Log("Holding: " + _pieceHoldingScriptRef.GetHeldCoordinateX() + ", " + _pieceHoldingScriptRef.GetHeldCoordinateY());
-        }
         else
             Debug.Log("Piece placed");
     }
@@ -41,9 +39,14 @@ public class BoardHandler : MonoBehaviour
 
     public void PlacePieceAtCoordinate(int tileCoordX, int tileCoordY)
     {
-        Debug.Log("Placed piece at coordinate" + _pieceHoldingScriptRef.GetHeldCoordinateX() + _pieceHoldingScriptRef.GetHeldCoordinateY() + " to coordinate" + tileCoordX + ", " + tileCoordY);
+        int toX = _pieceHoldingScriptRef.GetHeldCoordinateX(), toY = _pieceHoldingScriptRef.GetHeldCoordinateY();
+        //  if (toX != tileCoordX && toY != tileCoordY)
+        {
+            _chessBoard.UpdateBoardMove(toX, toY, tileCoordX, tileCoordY);
+        }
+
         _pieceHoldingScriptRef.GetPiece().Move(tileCoordX, tileCoordY);
-        _pieceHoldingScriptRef.SetPosition(tileCoordX, .05f, tileCoordY);
+
         _pieceHoldingScriptRef.SetHold(false);
         SetHold(null);   //clears the holding piece
     }
