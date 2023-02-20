@@ -40,7 +40,7 @@ public class BoardHandler : MonoBehaviour
     public void PlacePieceAtCoordinate(int tileCoordX, int tileCoordY)
     {
         int toX = _pieceHoldingScriptRef.GetHeldCoordinateX(), toY = _pieceHoldingScriptRef.GetHeldCoordinateY();
-        //  if (toX != tileCoordX && toY != tileCoordY)
+        if (toX != tileCoordX || toY != tileCoordY)
         {
             _chessBoard.UpdateBoardMove(toX, toY, tileCoordX, tileCoordY);
         }
