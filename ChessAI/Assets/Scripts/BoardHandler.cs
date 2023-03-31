@@ -11,6 +11,8 @@ public class BoardHandler : MonoBehaviour
 
     private PieceController _pieceHoldingScriptRef;
 
+    public List<CPS.Move> possibleCurrentMoves;
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -26,17 +28,29 @@ public class BoardHandler : MonoBehaviour
     {
         CPS.ChessPiece piece = heldPieceScriptRef.GetPiece();
         List<CPS.Move> possibleMoves = piece.GetPossibleMoves(ref _chessBoard);
-        int[] test;
+        int[] debugMoveArray;
         string debugStringForMoves = "";
         foreach (CPS.Move i in possibleMoves)
         {
-            test = i.GetMoveCoordinates() ;
-            debugStringForMoves += "(" + test[0] + ", " + test[1] + ") ";
-
-
+            debugMoveArray = i.GetMoveCoordinates() ;
+            debugStringForMoves += "(" + debugMoveArray[0] + ", " + debugMoveArray[1] + ") ";
         }
+        possibleCurrentMoves = possibleMoves;
         Debug.Log("Available Moves: " + debugStringForMoves);
 
+    }
+
+    public void ClearPossibleMoves()
+    {
+        possibleCurrentMoves.Clear();
+    }
+
+    public bool CanMoveToTile(ref TileController tile)
+    {
+        return true;
+        // ***** Continue from here *****
+        // You are currently debating whether to hold a list of possible tiles here and having a tile reference this whenever clicked or whether or not you should
+        // set a boolean whenever you click on  a tile
     }
 
     // Determines which piece is currently being held in order to move
@@ -69,5 +83,6 @@ public class BoardHandler : MonoBehaviour
 
         _pieceHoldingScriptRef.SetPieceHold(false);
         SetHold(null);   //clears the holding piece
+        ClearPossibleMoves();
     }
 }

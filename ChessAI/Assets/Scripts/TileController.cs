@@ -21,6 +21,16 @@ public class TileController : MonoBehaviour
         _tileCoordY = yCoord;
     }
 
+    public int GetTileCoordinateX()
+    {
+        return _tileCoordX;
+    }
+
+    public int GetTileCoordinateY()
+    {
+        return _tileCoordY;
+    }
+
     private void OnMouseDown()
     {
         // If the board handler is actually holding a piece

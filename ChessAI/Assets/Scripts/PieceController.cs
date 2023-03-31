@@ -81,9 +81,10 @@ public class PieceController : MonoBehaviour
     // Update is called once per frame
     private void OnMouseDown()
     {
+        // if the boardhandler is not currently holding any other piece
         if (!_bhScriptRef.GetHold())
         {
-            // Tells the board handler which piece it is holding
+            // Tells the board handler which piece it is holding along with updating itself to that fact
             SetPieceHold(true);
 
             // Calculates the move that the piece selected can make
