@@ -66,20 +66,30 @@ public class PieceController : MonoBehaviour
         transform.position = new Vector3(x, y, z);
     }
 
-    public void SetHold(bool isHolding)
+    public void SetPieceHold(bool isHolding)
     {
         _isBeingHeld = isHolding;
 
         // Will only send piece inforation to the Board Controller if it is actually holding a piece
         if (_isBeingHeld)
+        {
             _bhScriptRef.SetHold(this.GetComponent<PieceController>());
+        }
+            
     }
 
     // Update is called once per frame
     private void OnMouseDown()
     {
         if (!_bhScriptRef.GetHold())
-            SetHold(true);
+        {
+            // Tells the board handler which piece it is holding
+            SetPieceHold(true);
+
+            // Calculates the move that the piece selected can make
+            _bhScriptRef.CalculateMoves(this);
+        }
+            
     }
 
     public void SetPiece(CPS.ChessPiece newPiece)

@@ -21,6 +21,24 @@ public class BoardHandler : MonoBehaviour
         _chessBoard = cb;
     }
 
+    // Creates the available moves that a piece can make in relation to it's location
+    public void CalculateMoves(PieceController heldPieceScriptRef)
+    {
+        CPS.ChessPiece piece = heldPieceScriptRef.GetPiece();
+        List<CPS.Move> possibleMoves = piece.GetPossibleMoves(ref _chessBoard);
+        int[] test;
+        string debugStringForMoves = "";
+        foreach (CPS.Move i in possibleMoves)
+        {
+            test = i.GetMoveCoordinates() ;
+            debugStringForMoves += "(" + test[0] + ", " + test[1] + ") ";
+
+
+        }
+        Debug.Log("Available Moves: " + debugStringForMoves);
+
+    }
+
     // Determines which piece is currently being held in order to move
     // Set to null to clear
     public void SetHold(PieceController heldPieceScriptRef)
@@ -28,6 +46,7 @@ public class BoardHandler : MonoBehaviour
         _pieceHoldingScriptRef = heldPieceScriptRef;
         if (heldPieceScriptRef != null)
             Debug.Log("Holding: " + _pieceHoldingScriptRef.GetHeldCoordinateX() + ", " + _pieceHoldingScriptRef.GetHeldCoordinateY());
+
         else
             Debug.Log("Piece placed");
     }
@@ -37,6 +56,7 @@ public class BoardHandler : MonoBehaviour
         return _pieceHoldingScriptRef;
     }
 
+    // !! Might need to fix this at some point to remove all the dang move functions !!
     public void PlacePieceAtCoordinate(int tileCoordX, int tileCoordY)
     {
         int toX = _pieceHoldingScriptRef.GetHeldCoordinateX(), toY = _pieceHoldingScriptRef.GetHeldCoordinateY();
@@ -45,9 +65,9 @@ public class BoardHandler : MonoBehaviour
             _chessBoard.UpdateBoardMove(toX, toY, tileCoordX, tileCoordY);
         }
 
-        _pieceHoldingScriptRef.GetPiece().Move(tileCoordX, tileCoordY);
+        _pieceHoldingScriptRef.GetPiece().MoveTo(tileCoordX, tileCoordY);
 
-        _pieceHoldingScriptRef.SetHold(false);
+        _pieceHoldingScriptRef.SetPieceHold(false);
         SetHold(null);   //clears the holding piece
     }
 }
