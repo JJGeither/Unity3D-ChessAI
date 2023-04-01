@@ -65,7 +65,8 @@ public class ChessSetup : MonoBehaviour
             if (piece != null)
             {
                 // Deals with object transformations
-                GameObject myNewPiece = Instantiate(piece.pieceGameObject, new Vector3(piece.coordinateX, .05f, piece.coordinateY), Quaternion.identity);
+                int[] pieceCoordinates = piece.GetCoordinates();
+                GameObject myNewPiece = Instantiate(piece.GetGameObject(), new Vector3(pieceCoordinates[0], .05f, pieceCoordinates[1]), Quaternion.identity);
                 piece.SetGameObject(ref myNewPiece);
                 myNewPiece.transform.rotation = Quaternion.Euler(-90, 0, 0);
                 myNewPiece.transform.localScale = new Vector3(1500, 1500, 1500);
@@ -83,6 +84,6 @@ public class ChessSetup : MonoBehaviour
                 myNewPieceController.SetPiece(piece);
             }
         }
-        bhScriptRef.SetBoard(ref chessBoard);
+        bhScriptRef.SetBoard(chessBoard);
     }
 }

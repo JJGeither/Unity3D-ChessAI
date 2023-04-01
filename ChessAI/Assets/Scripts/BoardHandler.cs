@@ -1,117 +1,97 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using CPS = ChessPieceScript;   //alias to script.
+using CPS = ChessPieceScript;
 
-// This script will deal with the contents that make up the entire board
-// This includes the tiles and pieces, so all "Controller" scripts will answer and send information to this script for storage and processing of game states
+// This script handles the contents that make up the entire board, including the tiles and pieces.
+// All other "Controller" scripts will communicate with this script for storage and processing of game states.
+
 public class BoardHandler : MonoBehaviour
 {
     private CPS.ChessBoard _chessBoard;
 
-    private PieceController _pieceHoldingScriptRef;
+    private PieceController _selectedPieceController;
+    public List<CPS.Move> PossibleMoves { get; private set; }
 
-    public List<CPS.Move> possibleCurrentMoves;
-
-    // Start is called before the first frame update
-    private void Start()
+    public void SetBoard(CPS.ChessBoard chessBoard)
     {
+        _chessBoard = chessBoard;
     }
 
-    public void SetBoard(ref CPS.ChessBoard cb)
-    {
-        _chessBoard = cb;
-    }
+    // Creates the available moves that a piece can make in relation to its location.
+    // i.e [0,1] means it can move one space up
 
-    // Creates the available moves that a piece can make in relation to it's location
-    public void CalculateMoves(PieceController heldPieceScriptRef)
+    public void CalculateMoves(PieceController pieceController)
     {
-        CPS.ChessPiece piece = heldPieceScriptRef.GetPiece();
-        List<CPS.Move> possibleMoves = piece.GetPossibleMoves(ref _chessBoard);
-        int[] debugMoveArray;
-        string debugStringForMoves = "";
-        foreach (CPS.Move i in possibleMoves)
-        {
-            debugMoveArray = i.GetMoveCoordinates() ;
-            debugStringForMoves += "(" + debugMoveArray[0] + ", " + debugMoveArray[1] + ") ";
-        }
-        possibleCurrentMoves = possibleMoves;
-
-    }
-
-    public void ClearPossibleMoves()
-    {
-        possibleCurrentMoves.Clear();
+        var piece = pieceController.GetPiece();
+        var possibleMoves = piece.GetPossibleMoves(ref _chessBoard);
+        PossibleMoves = possibleMoves;
     }
 
     public bool CanMoveToTile(TileController tile)
     {
-        int[] tileCoordinates = tile.GetTileCoordinates();
-
-        int[] holdMovement = GetHeldCoordinates();
-        foreach (CPS.Move move in possibleCurrentMoves)
+        var tileCoordinates = tile.GetTileCoordinates();
+        var heldCoordinates = _selectedPieceController.GetPieceCoordinates();
+        foreach (var move in PossibleMoves)
         {
-            // If the tile is within the list of moveable spaces, you can move
-            
-            if (tileCoordinates[0] == move.GetMoveCoordinates()[0] + holdMovement[0] && tileCoordinates[1] == move.GetMoveCoordinates()[1] + holdMovement[1])
+            // If the tile is within the list of moveable spaces, you can move.
+            if (tileCoordinates[0] == move.GetMoveCoordinates()[0] + heldCoordinates[0] &&
+                tileCoordinates[1] == move.GetMoveCoordinates()[1] + heldCoordinates[1])
             {
                 return true;
             }
         }
         return false;
-        // ***** Continue from here *****
-        // You are currently debating whether to hold a list of possible tiles here and having a tile reference this whenever clicked or whether or not you should
-        // set a boolean whenever you click on  a tile
     }
 
-    // Determines which piece is currently being held in order to move
-    // Set to null to clear
-    public void SetHold(PieceController heldPieceScriptRef)
+    public void SetSelected(PieceController pieceController)
     {
-        _pieceHoldingScriptRef = heldPieceScriptRef;
-        if (heldPieceScriptRef != null)
-            Debug.Log("Holding: " + GetHeldCoordinates()[0] + ", " + GetHeldCoordinates()[1]);
-
+        // If it is currently not holding a piece and clicks on a piece it will pick up the passed variable.
+        if (pieceController != null)
+        {
+            _selectedPieceController = pieceController;
+            Debug.Log($"Selected: {GetHeldCoordinates()[0]}, {GetHeldCoordinates()[1]}");
+        }
         else
+        // Else it will place down the piece.
+        {
+            _selectedPieceController.SetPieceSelected(false);
+            _selectedPieceController = null;
             Debug.Log("Piece placed");
+        }
     }
 
-    public PieceController GetHold()
+    public void MoveSelectedTo(int x, int y)
     {
-        return _pieceHoldingScriptRef;
+        var heldCoordinates = GetHeldCoordinates();
+        var selectedPiece = _selectedPieceController.GetPiece();
+        selectedPiece.MoveTo(x, y);
+        // The if statement will go through if you don't just place down a piece at it's original positions
+        if (heldCoordinates[0] != x || heldCoordinates[1] != y)
+        {
+            _chessBoard.UpdateBoardMove(heldCoordinates[0], heldCoordinates[1], x, y);
+            EndTurn();
+        }
+    }
+
+    public PieceController GetSelected()
+    {
+        return _selectedPieceController;
     }
 
     public int[] GetHeldCoordinates()
     {
-        return _pieceHoldingScriptRef.GetPieceCoordinates();
+        return _selectedPieceController.GetPieceCoordinates();
     }
 
     public void EndTurn()
     {
-        // Write to switch turns
+        // To be implemented
     }
 
-    // !! Might need to fix this at some point to remove all the dang move functions !!
-    public void PlaceHeldPieceAtCoordinate(int[] tileCoordiantes)
+    public void PlaceSelectedPieceAtCoordinate(int[] tileCoordinates)
     {
-        int[] holdMovement = GetHeldCoordinates();
-        int toX = holdMovement[0], toY = holdMovement[1];
-        if (toX != tileCoordiantes[0] || toY != tileCoordiantes[1])
-        {
-            _chessBoard.UpdateBoardMove(toX, toY, tileCoordiantes[0], tileCoordiantes[1]);
-        }
-
-        // If you didn't just cancel a move by placing it on residing tile it will end the turn
-        if (GetHeldCoordinates() != tileCoordiantes)
-            EndTurn();
-
-        _pieceHoldingScriptRef.GetPiece().MoveTo(tileCoordiantes[0], tileCoordiantes[1]);
-
-        _pieceHoldingScriptRef.SetPieceHold(false);
-        SetHold(null);   //clears the holding piece
-        ClearPossibleMoves();
-
-
-
+        MoveSelectedTo(tileCoordinates[0], tileCoordinates[1]);
+        SetSelected(null);
+        PossibleMoves.Clear();
     }
 }

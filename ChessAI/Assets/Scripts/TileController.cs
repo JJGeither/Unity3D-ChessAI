@@ -29,10 +29,10 @@ public class TileController : MonoBehaviour
     private void OnMouseDown()
     {
         // If the board handler is actually holding a piece
-        PieceController heldPiece = bhScriptRef.GetHold();
+        PieceController heldPiece = bhScriptRef.GetSelected();
         if (heldPiece != null && bhScriptRef.CanMoveToTile(this))
         {
-            bhScriptRef.PlaceHeldPieceAtCoordinate(GetTileCoordinates());
+            bhScriptRef.PlaceSelectedPieceAtCoordinate(GetTileCoordinates());
                 
             
         } else

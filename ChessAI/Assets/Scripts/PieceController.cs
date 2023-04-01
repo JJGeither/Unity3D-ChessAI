@@ -8,7 +8,7 @@ using CPS = ChessPieceScript;   //alias to script.
 public class PieceController : MonoBehaviour
 {
     private int _layerMask;
-    private bool _isBeingHeld;
+    private bool _isBeingSelected;
     private Rigidbody rb;
     private CPS.ChessPiece _piece;
     private BoardHandler _bhScriptRef;
@@ -18,7 +18,7 @@ public class PieceController : MonoBehaviour
     private void Start()
     {
         _layerMask = LayerMask.GetMask("Tile");
-        _isBeingHeld = false;
+        _isBeingSelected = false;
         rb = GetComponent<Rigidbody>();
         GameObject obj_gameboard = GameObject.Find("Obj_GameBoard");
         _bhScriptRef = obj_gameboard.GetComponent<BoardHandler>();
@@ -28,13 +28,13 @@ public class PieceController : MonoBehaviour
     private void Update()
     {
         UpdateCollider();
-        UpdateHoldingMovement();
+        UpdateSelectedAnimation();
     }
 
     // Removes the collider for all pieces whenever a piece is being held
     public void UpdateCollider()
     {
-        if (_bhScriptRef.GetHold())
+        if (_bhScriptRef.GetSelected())
         {
             _collisionComponent.enabled = false;
         }
@@ -45,9 +45,9 @@ public class PieceController : MonoBehaviour
     }
 
     // Updates the movement of the piece that is being held
-    public void UpdateHoldingMovement()
+    public void UpdateSelectedAnimation()
     {
-        if (_isBeingHeld)
+        if (_isBeingSelected)
         {
             //GetComponent<Rigidbody>().position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
             RaycastHit hit;
@@ -66,26 +66,23 @@ public class PieceController : MonoBehaviour
         transform.position = new Vector3(x, y, z);
     }
 
-    public void SetPieceHold(bool isHolding)
+    public void SetPieceSelected(bool isSelected)
     {
-        _isBeingHeld = isHolding;
+        _isBeingSelected = isSelected;
 
-        // Will only send piece inforation to the Board Controller if it is actually holding a piece
-        if (_isBeingHeld)
-        {
-            _bhScriptRef.SetHold(this.GetComponent<PieceController>());
-        }
-            
+        // Will only send piece inforation to the Board Controller if it is actually Selecteding a piece
+        if (_isBeingSelected)
+            _bhScriptRef.SetSelected(this.GetComponent<PieceController>());
     }
 
     // Update is called once per frame
     private void OnMouseDown()
     {
-        // if the boardhandler is not currently holding any other piece
-        if (!_bhScriptRef.GetHold())
+        // if the boardhandler is not currently Selecteding any other piece
+        if (!_bhScriptRef.GetSelected())
         {
-            // Tells the board handler which piece it is holding along with updating itself to that fact
-            SetPieceHold(true);
+            // Tells the board handler which piece it is Selecteding along with updating itself to that fact
+            SetPieceSelected(true);
 
             // Calculates the move that the piece selected can make
             _bhScriptRef.CalculateMoves(this);
@@ -105,6 +102,6 @@ public class PieceController : MonoBehaviour
 
     public int[] GetPieceCoordinates()
     {
-        return new int[] { _piece.coordinateX, _piece.coordinateY };
+        return _piece.GetCoordinates();
     }
 }
