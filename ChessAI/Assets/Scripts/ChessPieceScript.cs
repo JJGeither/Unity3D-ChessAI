@@ -17,9 +17,47 @@ public class ChessPieceScript : MonoBehaviour
 
         public ChessPiece[,] GetBoard() => _board;
 
-        public bool CanMoveTo(ChessPiece piece, int x, int y)
+        public bool IsInBounds(int x, int y)
         {
             if (x < 0 || x >= 8 || y < 0 || y >= 8)
+                return false;
+            return true;
+        }
+
+        public bool CanMoveTo(ChessPiece piece, int x, int y)
+        {
+            if (!IsInBounds(x,y))
+                return false;
+
+            ChessPiece pieceAtDesiredPosition = GetPiece(x, y);
+            if (pieceAtDesiredPosition != null)
+                return pieceAtDesiredPosition.GetPieceColor() != piece.GetPieceColor();
+
+            return true;
+        }
+
+        // Will not assume that you can move straight and capture a piece as a pawn
+        public bool PawnCanMoveTo(ChessPiece piece, int x, int y)
+        {
+            if (!IsInBounds(x, y))
+                return false;
+
+            ChessPiece pieceAtDesiredPosition = GetPiece(x, y);
+            if (pieceAtDesiredPosition != null)
+                return false;
+
+            return true;
+        }
+
+        public bool EnPassant(ChessPiece piece, int x, int y)
+        {
+            return false;
+
+        }
+
+        public bool PawnCanCaptureDiagonals(ChessPiece piece, int x, int y)
+        {
+            if (!IsInBounds(x, y))
                 return false;
 
             ChessPiece pieceAtDesiredPosition = GetPiece(x, y);
@@ -28,7 +66,7 @@ public class ChessPieceScript : MonoBehaviour
                 return pieceAtDesiredPosition.GetPieceColor() != piece.GetPieceColor();
             }
 
-            return true;
+            return false;
         }
 
         public void CreatePieces(string FENString)
@@ -217,7 +255,7 @@ public class ChessPieceScript : MonoBehaviour
             relativeMoves.Add(new Move(0, 0));
 
             // Normal case
-            if (board.CanMoveTo(this, 0 + _coordinateX, 1 + _coordinateY))
+            if (board.PawnCanMoveTo(this, 0 + _coordinateX, 1 + _coordinateY))
                 relativeMoves.Add(new Move(0, 1));
 
             // Moving two spaces forward 
@@ -225,8 +263,17 @@ public class ChessPieceScript : MonoBehaviour
                 relativeMoves.Add(new Move(0, 2));
 
             // En passant
+            //if opponent pawn moves forward two squares
+            //Can go diagonally to the piece and capture the pawn
+            if (board.EnPassant(this, 1 + _coordinateX, _coordinateY))
+                relativeMoves.Add(new Move(1, 0));
 
             // Capturing
+            if (board.PawnCanCaptureDiagonals(this, 1 + _coordinateX, 1 + _coordinateY))
+                relativeMoves.Add(new Move(1, 1));
+            
+            if (board.PawnCanCaptureDiagonals(this, -1 + _coordinateX, 1 + _coordinateY))
+                relativeMoves.Add(new Move(-1, 1));
 
             return relativeMoves;
         }
@@ -247,6 +294,33 @@ public class ChessPieceScript : MonoBehaviour
         {
             _pieceGameObject = _pieceFolder[(6 * pColor)];
             _color = pColor;
+        }
+        public override List<Move> GetPossibleMoves(ref ChessBoard board)
+        {
+            List<Move> relativeMoves = new List<Move>();
+
+            relativeMoves.Add(new Move(0, 0));
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (board.CanMoveTo(this, i + _coordinateX, i + _coordinateY))
+                    relativeMoves.Add(new Move(i, i));
+
+                if (board.CanMoveTo(this, i + _coordinateX, -i + _coordinateY))
+                    relativeMoves.Add(new Move(i, -i));
+
+                if (board.CanMoveTo(this, -i + _coordinateX, -i + _coordinateY))
+                    relativeMoves.Add(new Move(-i, -i));
+
+                if (board.CanMoveTo(this, -i + _coordinateX, i + _coordinateY))
+                    relativeMoves.Add(new Move(-i, i));
+            }
+
+            // Normal case
+
+
+            return relativeMoves;
+
         }
     }
 
