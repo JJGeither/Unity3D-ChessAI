@@ -21,22 +21,23 @@ public class TileController : MonoBehaviour
         _tileCoordY = yCoord;
     }
 
-    public int GetTileCoordinateX()
+    public int[] GetTileCoordinates()
     {
-        return _tileCoordX;
-    }
-
-    public int GetTileCoordinateY()
-    {
-        return _tileCoordY;
+        return new int[] { _tileCoordX, _tileCoordY };
     }
 
     private void OnMouseDown()
     {
         // If the board handler is actually holding a piece
-        if (bhScriptRef.GetHold() != null)
+        PieceController heldPiece = bhScriptRef.GetHold();
+        if (heldPiece != null && bhScriptRef.CanMoveToTile(this))
         {
-            bhScriptRef.PlacePieceAtCoordinate(_tileCoordX, _tileCoordY);
+            bhScriptRef.PlaceHeldPieceAtCoordinate(GetTileCoordinates());
+                
+            
+        } else
+        {
+            Debug.Log("Cannot move to tile (" + _tileCoordX + ',' + _tileCoordY + ")");
         }
     }
 }

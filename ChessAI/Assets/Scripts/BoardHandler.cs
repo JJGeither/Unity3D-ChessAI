@@ -36,7 +36,6 @@ public class BoardHandler : MonoBehaviour
             debugStringForMoves += "(" + debugMoveArray[0] + ", " + debugMoveArray[1] + ") ";
         }
         possibleCurrentMoves = possibleMoves;
-        Debug.Log("Available Moves: " + debugStringForMoves);
 
     }
 
@@ -45,9 +44,21 @@ public class BoardHandler : MonoBehaviour
         possibleCurrentMoves.Clear();
     }
 
-    public bool CanMoveToTile(ref TileController tile)
+    public bool CanMoveToTile(TileController tile)
     {
-        return true;
+        int[] tileCoordinates = tile.GetTileCoordinates();
+
+        int[] holdMovement = GetHeldCoordinates();
+        foreach (CPS.Move move in possibleCurrentMoves)
+        {
+            // If the tile is within the list of moveable spaces, you can move
+            
+            if (tileCoordinates[0] == move.GetMoveCoordinates()[0] + holdMovement[0] && tileCoordinates[1] == move.GetMoveCoordinates()[1] + holdMovement[1])
+            {
+                return true;
+            }
+        }
+        return false;
         // ***** Continue from here *****
         // You are currently debating whether to hold a list of possible tiles here and having a tile reference this whenever clicked or whether or not you should
         // set a boolean whenever you click on  a tile
@@ -59,7 +70,7 @@ public class BoardHandler : MonoBehaviour
     {
         _pieceHoldingScriptRef = heldPieceScriptRef;
         if (heldPieceScriptRef != null)
-            Debug.Log("Holding: " + _pieceHoldingScriptRef.GetHeldCoordinateX() + ", " + _pieceHoldingScriptRef.GetHeldCoordinateY());
+            Debug.Log("Holding: " + GetHeldCoordinates()[0] + ", " + GetHeldCoordinates()[1]);
 
         else
             Debug.Log("Piece placed");
@@ -70,19 +81,37 @@ public class BoardHandler : MonoBehaviour
         return _pieceHoldingScriptRef;
     }
 
-    // !! Might need to fix this at some point to remove all the dang move functions !!
-    public void PlacePieceAtCoordinate(int tileCoordX, int tileCoordY)
+    public int[] GetHeldCoordinates()
     {
-        int toX = _pieceHoldingScriptRef.GetHeldCoordinateX(), toY = _pieceHoldingScriptRef.GetHeldCoordinateY();
-        if (toX != tileCoordX || toY != tileCoordY)
+        return _pieceHoldingScriptRef.GetPieceCoordinates();
+    }
+
+    public void EndTurn()
+    {
+        // Write to switch turns
+    }
+
+    // !! Might need to fix this at some point to remove all the dang move functions !!
+    public void PlaceHeldPieceAtCoordinate(int[] tileCoordiantes)
+    {
+        int[] holdMovement = GetHeldCoordinates();
+        int toX = holdMovement[0], toY = holdMovement[1];
+        if (toX != tileCoordiantes[0] || toY != tileCoordiantes[1])
         {
-            _chessBoard.UpdateBoardMove(toX, toY, tileCoordX, tileCoordY);
+            _chessBoard.UpdateBoardMove(toX, toY, tileCoordiantes[0], tileCoordiantes[1]);
         }
 
-        _pieceHoldingScriptRef.GetPiece().MoveTo(tileCoordX, tileCoordY);
+        // If you didn't just cancel a move by placing it on residing tile it will end the turn
+        if (GetHeldCoordinates() != tileCoordiantes)
+            EndTurn();
+
+        _pieceHoldingScriptRef.GetPiece().MoveTo(tileCoordiantes[0], tileCoordiantes[1]);
 
         _pieceHoldingScriptRef.SetPieceHold(false);
         SetHold(null);   //clears the holding piece
         ClearPossibleMoves();
+
+
+
     }
 }

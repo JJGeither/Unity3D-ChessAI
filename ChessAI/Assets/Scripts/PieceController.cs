@@ -103,13 +103,8 @@ public class PieceController : MonoBehaviour
         return ref _piece;
     }
 
-    public int GetHeldCoordinateX()
+    public int[] GetPieceCoordinates()
     {
-        return _piece.coordinateX;
-    }
-
-    public int GetHeldCoordinateY()
-    {
-        return _piece.coordinateY;
+        return new int[] { _piece.coordinateX, _piece.coordinateY };
     }
 }
