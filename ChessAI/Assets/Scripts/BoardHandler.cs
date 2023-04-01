@@ -12,9 +12,28 @@ public class BoardHandler : MonoBehaviour
     private PieceController _selectedPieceController;
     public List<CPS.Move> PossibleMoves { get; private set; }
 
+    public GameObject[] tileBorderRef;
+    public List<GameObject> TileBorderArray { get; private set; }
+
     public void SetBoard(CPS.ChessBoard chessBoard)
     {
         _chessBoard = chessBoard;
+    }
+
+
+    public void DrawMoveBorders(List<CPS.Move> possibleMoves)
+    {
+        TileBorderArray = new List<GameObject>();
+        int[] pieceCoordinates = GetSelected().GetPieceCoordinates();
+        foreach (CPS.Move move in possibleMoves)
+        {
+            int x = move.GetMoveCoordinates()[0] + pieceCoordinates[0];
+            int y = move.GetMoveCoordinates()[1] + pieceCoordinates[1];
+            GameObject borderObject = move.GetMoveCoordinates()[0] == 0 && move.GetMoveCoordinates()[1] == 0 ? tileBorderRef[1] : tileBorderRef[0];
+            GameObject border = Instantiate(borderObject, new Vector3(x, .05f, y), Quaternion.identity);
+            border.transform.Rotate(90f, 0f, 0f);
+            TileBorderArray.Add(border);
+        }
     }
 
     // Creates the available moves that a piece can make in relation to its location.
@@ -24,6 +43,7 @@ public class BoardHandler : MonoBehaviour
     {
         var piece = pieceController.GetPiece();
         var possibleMoves = piece.GetPossibleMoves(ref _chessBoard);
+        DrawMoveBorders(possibleMoves);
         PossibleMoves = possibleMoves;
     }
 
@@ -88,10 +108,20 @@ public class BoardHandler : MonoBehaviour
         // To be implemented
     }
 
+    public void DeleteMoveBorders()
+    {
+        foreach (GameObject border in TileBorderArray)
+        {
+            Destroy(border);
+        }
+        TileBorderArray.Clear();
+    }
+
     public void PlaceSelectedPieceAtCoordinate(int[] tileCoordinates)
     {
         MoveSelectedTo(tileCoordinates[0], tileCoordinates[1]);
         SetSelected(null);
         PossibleMoves.Clear();
+        DeleteMoveBorders();
     }
 }
