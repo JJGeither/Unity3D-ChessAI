@@ -12,7 +12,7 @@ public class PieceController : MonoBehaviour
     private Rigidbody rb;
     private CPS.ChessPiece _piece;
     private BoardHandler _bhScriptRef;
-    private CapsuleCollider _collisionComponent;
+    private BoxCollider _collisionComponent;
 
     // Start is called before the first frame update
     private void Start()
@@ -22,7 +22,7 @@ public class PieceController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         GameObject obj_gameboard = GameObject.Find("Obj_GameBoard");
         _bhScriptRef = obj_gameboard.GetComponent<BoardHandler>();
-        _collisionComponent = this.GetComponent<CapsuleCollider>();
+        _collisionComponent = this.GetComponent<BoxCollider>();
     }
 
     private void Update()
@@ -79,15 +79,17 @@ public class PieceController : MonoBehaviour
     private void OnMouseDown()
     {
         // if the boardhandler is not currently Selecteding any other piece
-        if (!_bhScriptRef.GetSelected())
+        if (!_bhScriptRef.GetSelected() && (_bhScriptRef.GetTurn() % 2 == GetPieceColor() || _bhScriptRef.IsNoTurnOrder()))
         {
             // Tells the board handler which piece it is Selecteding along with updating itself to that fact
             SetPieceSelected(true);
 
             // Calculates the move that the piece selected can make
-            _bhScriptRef.CalculateMoves(this);
+            _bhScriptRef.CalculateLegalMoves(_piece);
+            _piece.GetGameObject().GetComponent<PieceController>().SetPieceSelected(true);
+
+            _bhScriptRef.DrawMoveBorders(_bhScriptRef.PossibleMoves);
         }
-            
     }
 
     public void SetPiece(CPS.ChessPiece newPiece)
@@ -98,6 +100,11 @@ public class PieceController : MonoBehaviour
     public ref CPS.ChessPiece GetPiece()
     {
         return ref _piece;
+    }
+
+    public int GetPieceColor()
+    {
+        return _piece.GetPieceColor();
     }
 
     public int[] GetPieceCoordinates()

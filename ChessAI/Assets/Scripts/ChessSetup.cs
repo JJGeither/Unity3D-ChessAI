@@ -18,6 +18,7 @@ public class ChessSetup : MonoBehaviour
     private Material[] _tileMaterials = new Material[2];
 
     private BoardHandler bhScriptRef;
+    private AIController aiScriptRef;
 
     //private ChessPieceScript _CPS;
 
@@ -25,15 +26,16 @@ public class ChessSetup : MonoBehaviour
     private void Start()
     {
         bhScriptRef = this.GetComponent<BoardHandler>();
+        aiScriptRef = this.GetComponent<AIController>();
         DrawTiles();
-        SetupBoard();
+        SetupPieces();
     }
 
     public void DrawTiles()
     {
         GameObject childObjectTile = new GameObject("ChildObjectTile"); //creates a child to store all the children for organization
         childObjectTile.transform.parent = gameObject.transform;
-        int k = 1;
+        int k = 0;
         for (int x = 0; x < 8; x++)
         {
             k++;
@@ -45,45 +47,31 @@ public class ChessSetup : MonoBehaviour
                 myNewTile.GetComponent<Renderer>().material = _tileMaterials[k % 2];
 
                 // Added for onmousedown detection by the tile controller
-                myNewTile.AddComponent<CapsuleCollider>();
+                myNewTile.AddComponent<BoxCollider>();
                 Rigidbody rb = myNewTile.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
 
                 TileController myNewTileController = myNewTile.AddComponent<TileController>();
-                myNewTileController.SetTileCoordinate(y, x);    //FIX THIS
+                myNewTileController.SetTileCoordinate(y, x);
             }
         }
     }
 
-    public void SetupBoard()
+    public void SetupPieces()
     {
         CPS.ChessBoard chessBoard = new CPS.ChessBoard(_FENString);
         GameObject childObjectPiece = new GameObject("ChildObjectPiece");   //creates a child to store all the children for organization
         childObjectPiece.transform.parent = gameObject.transform;
         foreach (var piece in chessBoard.GetBoard())
         {
-            if (piece != null)
+            if (piece.GetName() != "empty")
             {
                 // Deals with object transformations
                 int[] pieceCoordinates = piece.GetCoordinates();
-                GameObject myNewPiece = Instantiate(piece.GetGameObject(), new Vector3(pieceCoordinates[0], .05f, pieceCoordinates[1]), Quaternion.identity);
-                piece.SetGameObject(ref myNewPiece);
-                myNewPiece.transform.rotation = Quaternion.Euler(-90, 0, 0);
-                myNewPiece.transform.localScale = new Vector3(1500, 1500, 1500);
-
-                // Sets the parent of the piece to be a new chess parent object
-                myNewPiece.transform.parent = childObjectPiece.transform;
-
-                // Added for onmousedown detection by the piece controller
-                myNewPiece.AddComponent<CapsuleCollider>();
-                Rigidbody rb = myNewPiece.AddComponent<Rigidbody>();
-                rb.isKinematic = true;
-
-                // Passes the information of the piece into the piece controller
-                PieceController myNewPieceController = myNewPiece.AddComponent<PieceController>();
-                myNewPieceController.SetPiece(piece);
+                bhScriptRef.SetupPiece(piece, pieceCoordinates);
             }
         }
         bhScriptRef.SetBoard(chessBoard);
+        aiScriptRef.SetBoard(chessBoard);
     }
 }

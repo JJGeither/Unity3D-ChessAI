@@ -15,6 +15,7 @@ public class TileController : MonoBehaviour
         GameObject obj_gameboard = GameObject.Find("Obj_GameBoard");
         bhScriptRef = obj_gameboard.GetComponent<BoardHandler>();
     }
+
     public void SetTileCoordinate(int xCoord, int yCoord)
     {
         _tileCoordX = xCoord;
@@ -30,12 +31,25 @@ public class TileController : MonoBehaviour
     {
         // If the board handler is actually holding a piece
         PieceController heldPiece = bhScriptRef.GetSelected();
-        if (heldPiece != null && bhScriptRef.CanMoveToTile(this))
+        ChessPieceScript.Move move = bhScriptRef.GetTileMove(this);
+        if (heldPiece != null && move != null)
         {
-            bhScriptRef.PlaceSelectedPieceAtCoordinate(GetTileCoordinates());
-                
-            
-        } else
+            ChessPieceScript.ChessPiece selectedPiece = bhScriptRef.GetSelectedPiece();
+            if (bhScriptRef.CanMoveToTile(this, move))
+            {
+                bhScriptRef.PerformSpecialMove(selectedPiece, move);
+                bhScriptRef.PlaceSelectedPieceAtCoordinate(GetTileCoordinates());
+                bhScriptRef.PawnPromotion(GetTileCoordinates());
+
+                int checkColor = bhScriptRef.GetTurn() % 2;
+                if (bhScriptRef.IsColorInCheck(checkColor))
+                {
+                    bool checkmate = bhScriptRef.IsColorInCheckmate(checkColor);
+                    Debug.Log("Is in checkmate?: " + checkmate);
+                }
+            }
+        }
+        else
         {
             Debug.Log("Cannot move to tile (" + _tileCoordX + ',' + _tileCoordY + ")");
         }
